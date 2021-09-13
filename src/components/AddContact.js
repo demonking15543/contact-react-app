@@ -12,13 +12,15 @@ export default class AddContact extends Component {
             return;
         }
         this.props.addContactHandler(this.state);
-        this.setState({name:"", email:""})
+        this.setState({name:"", email:""});
+        this.props.history.push('/');
+
         
 
     }
     render() {
         return (
-            <div className="ui main">
+            <div className="ui main" style={{marginTop:"5rem"}}>
                 <h2>Add Contact</h2>
                 <form action="#" className="ui form" onSubmit={this.add}>
                     <div className="field">
