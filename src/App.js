@@ -9,6 +9,7 @@ import { uuid } from "uuidv4"
 
 import { BrowserRouter as Router, Switch, Route  } from "react-router-dom";
 import ContactDetail from './components/ContactDetail';
+import EditContact from './components/EditContact';
 
 function App() {
   const LOCAL_STORAGE = "contacts"
@@ -18,12 +19,27 @@ const retriveContacts = async () => {
   const response = await api.get('/contacts/');
   return response.data
 };
- const addContactHandler = (contact) => {
+ const addContactHandler = async (contact) => {
    console.log(contact);
-   setContacts([...contacts, {id: uuid(), ...contact}]);
+   const request = {
+     id:uuid(),
+     ...contact
+   }
+   const response = await api.post("/contacts", request)
+   setContacts([...contacts, response.data]);
+ };
+ const updateContactHandler = async (contact) => {
+   const response = await api.put(`/contacts/${contact.id}`, contact)
+   console.log(response.data)
+   const {id, name, email } = response.data;
+   setContacts(contacts.map((contact)=>{
+     return contact.id === id ? {...response.data}: contact;
+   }))
+
  };
 
- const removeContactHandler = (id) => {
+ const removeContactHandler =async  (id) => {
+   await api.delete(`/contacts/${id}`);
    const newContactList = contacts.filter((contact) => {
      return contact.id !== id;
    });
@@ -73,6 +89,22 @@ const retriveContacts = async () => {
            component={ContactDetail}
            
            />
+
+
+
+
+
+        <Route 
+          path="/edit" 
+          render={(props) =>(
+            <EditContact 
+            {...props}
+            updateContactHandler={updateContactHandler}
+            />
+          )}
+          
+           />
+          
         {/* <AddContect addContactHandler={addContactHandler} /> */}
         {/* <ContactList contacts={contacts} getContactId={removeContactHandler} /> */}
         </Switch>
